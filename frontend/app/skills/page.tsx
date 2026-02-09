@@ -309,7 +309,7 @@ export default function SkillsPage() {
                     min="0"
                     max="100"
                     value={formData.current_level}
-                    onChange={(e) => setFormData({ ...formData, current_level: parseInt(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, current_level: parseInt(e.target.value, 10) || 0 })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
@@ -324,7 +324,7 @@ export default function SkillsPage() {
                     min="0"
                     max="100"
                     value={formData.target_level}
-                    onChange={(e) => setFormData({ ...formData, target_level: parseInt(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, target_level: parseInt(e.target.value, 10) || 0 })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>

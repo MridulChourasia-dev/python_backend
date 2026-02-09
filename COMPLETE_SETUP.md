@@ -36,15 +36,22 @@ The `.env` file already contains a secure SECRET_KEY and default configuration.
 
 ### 2. Run Database Migration
 
-To create all database tables, you need to run the Alembic migration:
+To create all database tables, you need to run the Alembic migration.
+
+**Prerequisites**: Ensure you have PostgreSQL running and Python dependencies installed.
 
 ```bash
 cd backend
+
+# Install dependencies if not already done
+pip install -r requirements.txt
+
+# Generate and run migration
 alembic revision --autogenerate -m "Initial migration with all tables"
 alembic upgrade head
 ```
 
-This will create the `alembic/versions/` directory with migration files.
+This will create the `alembic/versions/` directory with migration files and apply them to your database.
 
 ### 3. Start the Application
 

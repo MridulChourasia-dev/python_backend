@@ -276,7 +276,7 @@ export default function ProgressPage() {
                     step="0.5"
                     min="0"
                     value={formData.hours_spent}
-                    onChange={(e) => setFormData({ ...formData, hours_spent: parseFloat(e.target.value) })}
+                    onChange={(e) => setFormData({ ...formData, hours_spent: parseFloat(e.target.value) || 0 })}
                     className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   />
                 </div>
