@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { progressAPI } from '@/lib/api'
-import { formatDate, getMoodEmoji, groupByDate } from '@/lib/utils'
+import { formatDate,  groupByDate } from '@/lib/utils'
 import { 
   TrendingUp, 
   Plus, 
@@ -32,6 +32,11 @@ const moodOptions = [
   { value: 'bad', label: 'Bad', emoji: '😞' },
   { value: 'terrible', label: 'Terrible', emoji: '😢' }
 ]
+
+const getMoodEmoji = (mood: string): string => {
+  const option = moodOptions.find(opt => opt.value === mood)
+  return option?.emoji || '😐'
+}
 
 export default function ProgressPage() {
   const router = useRouter()
@@ -65,7 +70,7 @@ export default function ProgressPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      await progressAPI.createLog(formData)
+      await progressAPI.createProgressLog(formData)
       await loadLogs()
       handleCloseModal()
     } catch (error) {
@@ -76,7 +81,7 @@ export default function ProgressPage() {
   const handleDelete = async (id: number) => {
     if (confirm('Are you sure you want to delete this log?')) {
       try {
-        await progressAPI.deleteLog(id)
+        await progressAPI.deleteProgressLog(id)
         await loadLogs()
       } catch (error) {
         console.error('Failed to delete log:', error)

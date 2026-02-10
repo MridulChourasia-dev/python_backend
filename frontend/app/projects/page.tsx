@@ -3,7 +3,17 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { projectsAPI } from '@/lib/api'
-import { formatDate, getProjectStatusColor } from '@/lib/utils'
+import { formatDate } from '@/lib/utils'
+
+const getProjectStatusColor = (status: string): string => {
+  const colorMap: Record<string, string> = {
+    planning: 'text-blue-400',
+    active: 'text-green-400',
+    completed: 'text-emerald-400',
+    on_hold: 'text-yellow-400'
+  }
+  return colorMap[status] || 'text-gray-400'
+}
 import { 
   FolderKanban, 
   Plus, 
