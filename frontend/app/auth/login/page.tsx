@@ -6,7 +6,9 @@ import Link from 'next/link'
 import { authAPI } from '@/lib/api'
 import { Mail, Lock, Loader2, CheckCircle } from 'lucide-react'
 
-export default function LoginPage() {
+import { Suspense } from 'react'
+
+function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [loading, setLoading] = useState(false)
@@ -129,5 +131,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 text-primary-500 animate-spin" />
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
