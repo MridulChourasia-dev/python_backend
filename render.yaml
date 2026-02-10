@@ -1,18 +1,11 @@
 services:
-  # 1. PostgreSQL Database
-  - type: database
-    name: skillsphere-db
-    databaseName: skillsphere
-    user: skillsphere_user
-    plan: free
-
-  # 2. Redis for caching (Optional but recommended)
+  # 1. Redis for caching
   - type: redis
     name: skillsphere-redis
     plan: free
     ipAllowList: [] # Allow internal traffic
 
-  # 3. Backend (FastAPI)
+  # 2. Backend (FastAPI)
   - type: web
     name: skillsphere-backend
     env: python
@@ -34,9 +27,9 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: CORS_ORIGINS
-        value: "*" # Initially allow all, update this to your frontend URL later for security
+        value: "*" # Initially allow all
 
-  # 4. Frontend (Next.js)
+  # 3. Frontend (Next.js)
   - type: web
     name: skillsphere-frontend
     env: node
@@ -50,3 +43,10 @@ services:
           type: web
           name: skillsphere-backend
           property: host
+
+databases:
+  # 4. PostgreSQL Database
+  - name: skillsphere-db
+    databaseName: skillsphere
+    user: skillsphere_user
+    plan: free
