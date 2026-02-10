@@ -7,6 +7,11 @@ if (API_URL && !API_URL.startsWith('http')) {
     API_URL = `https://${API_URL}`
 }
 
+// Fix Render's internal host mapping if it's missing the domain
+if (API_URL && !API_URL.includes('.') && !API_URL.includes('localhost')) {
+    API_URL = `${API_URL}.onrender.com`
+}
+
 // Create axios instance
 const api = axios.create({
     baseURL: API_URL,
