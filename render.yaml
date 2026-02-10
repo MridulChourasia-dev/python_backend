@@ -1,6 +1,6 @@
 services:
-  # 1. Redis for caching
-  - type: redis
+  # 1. Redis (Key Value Store)
+  - type: keyvalue
     name: skillsphere-redis
     plan: free
     ipAllowList: [] # Allow internal traffic
@@ -19,7 +19,8 @@ services:
           name: skillsphere-db
           property: connectionString
       - key: REDIS_URL
-        fromRedis:
+        fromService:
+          type: keyvalue
           name: skillsphere-redis
           property: connectionString
       - key: SECRET_KEY
