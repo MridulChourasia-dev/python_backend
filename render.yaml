@@ -1,13 +1,18 @@
 databases:
+  # 1. PostgreSQL Database
   - name: skillsphere-db
+    databaseName: skillsphere
+    user: skillsphere_user
     plan: free
 
 services:
+  # 2. Redis for caching (Key Value Store)
   - type: keyvalue
     name: skillsphere-redis
     plan: free
-    ipAllowList: [] # Required to allow access from other services
+    ipAllowList: [] # Allow internal traffic
 
+  # 3. Backend (FastAPI)
   - type: web
     name: skillsphere-backend
     env: python
@@ -30,8 +35,9 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: CORS_ORIGINS
-        value: "*"
+        value: "*" # Initially allow all
 
+  # 4. Frontend (Next.js)
   - type: web
     name: skillsphere-frontend
     env: node
