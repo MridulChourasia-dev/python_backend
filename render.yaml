@@ -6,6 +6,7 @@ services:
   - type: keyvalue
     name: skillsphere-redis
     plan: free
+    ipAllowList: [] # Required to allow access from other services
 
   - type: web
     name: skillsphere-backend
