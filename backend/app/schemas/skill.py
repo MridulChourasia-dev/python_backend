@@ -5,15 +5,15 @@ Skill schemas
 from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
-from app.models.skill import SkillLevel
+
 
 
 class SkillBase(BaseModel):
     """Base skill schema"""
     name: str = Field(..., min_length=1, max_length=100)
     category: Optional[str] = None
-    level: SkillLevel = SkillLevel.BEGINNER
-    target_level: Optional[SkillLevel] = None
+    current_level: int = Field(default=0, ge=0, le=100)
+    target_level: int = Field(default=100, ge=0, le=100)
     description: Optional[str] = None
 
 
@@ -26,8 +26,8 @@ class SkillUpdate(BaseModel):
     """Schema for updating a skill"""
     name: Optional[str] = None
     category: Optional[str] = None
-    level: Optional[SkillLevel] = None
-    target_level: Optional[SkillLevel] = None
+    current_level: Optional[int] = Field(None, ge=0, le=100)
+    target_level: Optional[int] = Field(None, ge=0, le=100)
     description: Optional[str] = None
     hours_invested: Optional[int] = None
 

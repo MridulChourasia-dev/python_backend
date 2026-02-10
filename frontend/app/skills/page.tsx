@@ -4,12 +4,15 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { skillsAPI } from '@/lib/api'
 import { getSkillLevelLabel, getSkillLevelColor, calculateProgress } from '@/lib/utils'
+import SmoothLayout from '@/components/SmoothLayout'
+import LoadingSpinner from '@/components/LoadingSpinner'
+import EmptyState from '@/components/EmptyState'
+import Modal from '@/components/Modal'
 import { 
   Target, 
   Plus, 
   Edit, 
-  Trash2, 
-  X, 
+  Trash2,
   Save,
   TrendingUp,
   BookOpen,
@@ -121,27 +124,23 @@ export default function SkillsPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    )
+    return <LoadingSpinner fullScreen message="Loading your skills..." />
   }
 
   const categories = ['Programming', 'Frontend', 'Backend', 'DevOps', 'Design', 'Other']
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <SmoothLayout>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Skills</h1>
             <p className="text-gray-400">Track and improve your skills</p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all shadow-lg shadow-primary-500/30 w-full sm:w-auto justify-center"
           >
             <Plus className="w-5 h-5" />
             Add Skill
@@ -149,8 +148,8 @@ export default function SkillsPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="glass rounded-xl p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="glass rounded-xl p-6 hover:translate-y-[-4px] transition-transform shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Total Skills</p>
@@ -160,7 +159,7 @@ export default function SkillsPage() {
             </div>
           </div>
           
-          <div className="glass rounded-xl p-6">
+          <div className="glass rounded-xl p-6 hover:translate-y-[-4px] transition-transform shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Average Progress</p>
@@ -174,7 +173,7 @@ export default function SkillsPage() {
             </div>
           </div>
           
-          <div className="glass rounded-xl p-6">
+          <div className="glass rounded-xl p-6 hover:translate-y-[-4px] transition-transform shadow-xl sm:col-span-2 lg:col-span-1">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Categories</p>
@@ -194,16 +193,18 @@ export default function SkillsPage() {
             const Icon = categoryIcons[skill.category] || BookOpen
             
             return (
-              <div key={skill.id} className="glass rounded-xl p-6 hover:scale-105 transition-all">
+              <div key={skill.id} className="glass rounded-xl p-6 hover:border-primary-500/50 transition-all group shadow-lg">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <Icon className="w-8 h-8 text-primary-500" />
+                    <div className="p-2 bg-primary-500/10 rounded-lg group-hover:bg-primary-500/20 transition-colors">
+                      <Icon className="w-6 h-6 text-primary-500" />
+                    </div>
                     <div>
                       <h3 className="text-xl font-bold text-white">{skill.name}</h3>
                       <p className="text-sm text-gray-400">{skill.category}</p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => handleEdit(skill)}
                       className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -220,25 +221,25 @@ export default function SkillsPage() {
                 </div>
 
                 {skill.description && (
-                  <p className="text-gray-400 text-sm mb-4">{skill.description}</p>
+                  <p className="text-gray-400 text-sm mb-4 line-clamp-2">{skill.description}</p>
                 )}
 
-                <div className="mb-2">
+                <div className="mt-auto">
                   <div className="flex justify-between text-sm mb-2">
                     <span className="text-gray-400">Progress</span>
                     <span className={`font-semibold ${getSkillLevelColor(skill.current_level)}`}>
                       {getSkillLevelLabel(skill.current_level)}
                     </span>
                   </div>
-                  <div className="w-full bg-gray-700/50 rounded-full h-3 overflow-hidden">
+                  <div className="w-full bg-gray-700/50 rounded-full h-2.5 overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-500"
+                      className="h-full bg-gradient-to-r from-primary-500 to-primary-600 transition-all duration-700 ease-out"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
-                  <div className="flex justify-between text-xs text-gray-500 mt-1">
-                    <span>Level {skill.current_level}</span>
-                    <span>{progress}%</span>
+                  <div className="flex justify-between text-[10px] text-gray-500 mt-2 uppercase tracking-wider">
+                    <span>Lvl {skill.current_level}</span>
+                    <span className="text-primary-400 font-bold">{progress}%</span>
                     <span>Goal {skill.target_level}</span>
                   </div>
                 </div>
@@ -248,121 +249,115 @@ export default function SkillsPage() {
         </div>
 
         {skills.length === 0 && (
-          <div className="text-center py-16">
-            <Target className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">No skills yet. Add your first skill to get started!</p>
-          </div>
+          <EmptyState
+            icon={Target}
+            title="No Skills Yet"
+            description="Start your learning journey by adding your first skill"
+            actionLabel="Add Skill"
+            onAction={() => setShowModal(true)}
+          />
         )}
       </div>
 
       {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass rounded-2xl p-8 max-w-md w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">
-                {editingSkill ? 'Edit Skill' : 'Add New Skill'}
-              </h2>
-              <button onClick={handleCloseModal} className="p-2 hover:bg-white/10 rounded-lg">
-                <X className="w-6 h-6 text-gray-400" />
-              </button>
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        title={editingSkill ? 'Edit Skill' : 'Add New Skill'}
+        maxWidth="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Skill Name
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all"
+              placeholder="e.g., Python, React, Docker"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Category
+            </label>
+            <select
+              value={formData.category}
+              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              className="w-full px-4 py-3 bg-[#111827] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Current Level
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                max="100"
+                value={formData.current_level}
+                onChange={(e) => setFormData({ ...formData, current_level: parseInt(e.target.value, 10) || 0 })}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Skill Name
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="e.g., Python, React, Docker"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Category
-                </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat} className="bg-gray-900">{cat}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Current Level (0-100)
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    max="100"
-                    value={formData.current_level}
-                    onChange={(e) => setFormData({ ...formData, current_level: parseInt(e.target.value, 10) || 0 })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Target Level (0-100)
-                  </label>
-                  <input
-                    type="number"
-                    required
-                    min="0"
-                    max="100"
-                    value={formData.target_level}
-                    onChange={(e) => setFormData({ ...formData, target_level: parseInt(e.target.value, 10) || 0 })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                  rows={3}
-                  placeholder="What do you want to learn?"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <Save className="w-5 h-5" />
-                  {editingSkill ? 'Update' : 'Create'}
-                </button>
-              </div>
-            </form>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Target Level
+              </label>
+              <input
+                type="number"
+                required
+                min="0"
+                max="100"
+                value={formData.target_level}
+                onChange={(e) => setFormData({ ...formData, target_level: parseInt(e.target.value, 10) || 0 })}
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none h-24 transition-all"
+              placeholder="What do you want to learn?"
+            />
+          </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
+            >
+              <Save className="w-5 h-5" />
+              {editingSkill ? 'Update' : 'Create'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </SmoothLayout>
   )
 }

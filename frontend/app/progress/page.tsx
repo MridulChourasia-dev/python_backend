@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { progressAPI } from '@/lib/api'
 import { formatDate,  groupByDate } from '@/lib/utils'
+import SmoothLayout from '@/components/SmoothLayout'
+import LoadingSpinner from '@/components/LoadingSpinner'
+import Modal from '@/components/Modal'
 import { 
   TrendingUp, 
   Plus, 
   Calendar,
   Clock,
-  Smile,
-  X,
-  Save
+  Save,
+  Trash2
 } from 'lucide-react'
 
 interface ProgressLog {
@@ -101,11 +103,7 @@ export default function ProgressPage() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
-    )
+    return <LoadingSpinner fullScreen message="Loading your progress..." />
   }
 
   const totalHours = logs.reduce((sum, log) => sum + (log.hours_spent || 0), 0)
@@ -113,17 +111,17 @@ export default function ProgressPage() {
   const groupedLogs = groupByDate(logs)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-6">
+    <SmoothLayout>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
           <div>
             <h1 className="text-4xl font-bold text-white mb-2">Progress</h1>
             <p className="text-gray-400">Track your daily learning progress</p>
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all shadow-lg shadow-primary-500/30 w-full sm:w-auto justify-center"
           >
             <Plus className="w-5 h-5" />
             Log Progress
@@ -131,8 +129,8 @@ export default function ProgressPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="glass rounded-xl p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          <div className="glass rounded-xl p-6 hover:translate-y-[-4px] transition-transform shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Total Logs</p>
@@ -142,7 +140,7 @@ export default function ProgressPage() {
             </div>
           </div>
           
-          <div className="glass rounded-xl p-6">
+          <div className="glass rounded-xl p-6 hover:translate-y-[-4px] transition-transform shadow-xl">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Total Hours</p>
@@ -152,7 +150,7 @@ export default function ProgressPage() {
             </div>
           </div>
           
-          <div className="glass rounded-xl p-6">
+          <div className="glass rounded-xl p-6 hover:translate-y-[-4px] transition-transform shadow-xl sm:col-span-2 lg:col-span-1">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-400 text-sm">Avg Hours/Day</p>
@@ -164,46 +162,55 @@ export default function ProgressPage() {
         </div>
 
         {/* Timeline */}
-        <div className="space-y-8">
+        <div className="space-y-12 relative before:absolute before:inset-y-0 before:left-8 before:w-px before:bg-white/5">
           {Object.entries(groupedLogs).map(([date, dateLogs]) => (
-            <div key={date}>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center gap-2 glass rounded-lg px-4 py-2">
-                  <Calendar className="w-4 h-4 text-gray-400" />
-                  <span className="text-white font-semibold">{date}</span>
-                </div>
-                <div className="flex-1 h-px bg-white/10" />
+            <div key={date} className="relative pl-16">
+              {/* Date Marker */}
+              <div className="absolute left-6 top-1 w-4 h-4 rounded-full bg-primary-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] z-10" />
+              
+              <div className="mb-6">
+                <span className="text-xs font-bold uppercase tracking-widest text-primary-400 bg-primary-500/10 px-3 py-1 rounded-full">{date}</span>
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-6">
                 {dateLogs.map((log) => (
-                  <div key={log.id} className="glass rounded-xl p-6 hover:scale-[1.02] transition-all">
-                    <div className="flex justify-between items-start mb-3">
-                      <div className="flex items-start gap-3">
-                        {log.mood && (
-                          <span className="text-3xl">{getMoodEmoji(log.mood)}</span>
-                        )}
-                        <div>
-                          <h3 className="text-xl font-bold text-white">{log.title}</h3>
+                  <div key={log.id} className="glass rounded-2xl p-6 hover:border-white/20 transition-all group relative overflow-hidden shadow-lg">
+                    <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={() => handleDelete(log.id)}
+                        className="p-2 hover:bg-red-500/10 rounded-lg transition-colors group/del"
+                      >
+                        <Trash2 className="w-4 h-4 text-gray-500 group-hover/del:text-red-500" />
+                      </button>
+                    </div>
+
+                    <div className="flex items-start gap-5">
+                      {log.mood && (
+                        <div className="text-4xl filter drop-shadow-lg shrink-0">{getMoodEmoji(log.mood)}</div>
+                      )}
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-white mb-2 group-hover:text-primary-400 transition-colors">{log.title}</h3>
+                        
+                        <div className="flex flex-wrap gap-4 items-center">
                           {log.hours_spent !== undefined && log.hours_spent > 0 && (
-                            <div className="flex items-center gap-2 text-sm text-gray-400 mt-1">
+                            <div className="flex items-center gap-1.5 text-sm font-semibold text-blue-400">
                               <Clock className="w-4 h-4" />
                               <span>{log.hours_spent} {log.hours_spent === 1 ? 'hour' : 'hours'}</span>
                             </div>
                           )}
+                          <div className="text-xs text-gray-500 flex items-center gap-1.5 uppercase font-bold tracking-tighter">
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>Logged at {new Date(log.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
                         </div>
-                      </div>
-                      <button
-                        onClick={() => handleDelete(log.id)}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-colors"
-                      >
-                        <X className="w-4 h-4 text-gray-400 hover:text-red-500" />
-                      </button>
-                    </div>
 
-                    {log.description && (
-                      <p className="text-gray-300 leading-relaxed">{log.description}</p>
-                    )}
+                        {log.description && (
+                          <div className="mt-4 p-4 bg-white/5 rounded-xl border border-white/5">
+                            <p className="text-gray-300 leading-relaxed text-sm">{log.description}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -212,118 +219,120 @@ export default function ProgressPage() {
         </div>
 
         {logs.length === 0 && (
-          <div className="text-center py-16">
-            <TrendingUp className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-            <p className="text-gray-400 text-lg">No progress logs yet. Start logging your progress!</p>
+          <div className="text-center py-24 bg-white/5 rounded-3xl border border-dashed border-white/10 mt-8">
+            <div className="p-6 bg-primary-500/10 rounded-full w-fit mx-auto mb-6">
+              <TrendingUp className="w-16 h-16 text-primary-500" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2 uppercase tracking-tight">No progress track yet</h2>
+            <p className="text-gray-500 max-w-sm mx-auto mb-8">Consistency is key. Start logging your daily wins and watch your growth over time.</p>
+            <button
+              onClick={() => setShowModal(true)}
+              className="px-8 py-3 bg-primary-500 hover:bg-primary-600 text-white rounded-xl font-bold transition-all shadow-xl shadow-primary-500/20"
+            >
+              Log Your First Entry
+            </button>
           </div>
         )}
       </div>
 
       {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="glass rounded-2xl p-8 max-w-md w-full">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white">Log Progress</h2>
-              <button onClick={handleCloseModal} className="p-2 hover:bg-white/10 rounded-lg">
-                <X className="w-6 h-6 text-gray-400" />
-              </button>
+      <Modal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        title="Log Progress"
+        maxWidth="md"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Date
+            </label>
+            <input
+              type="date"
+              required
+              value={formData.date}
+              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              className="w-full px-4 py-3 bg-[#111827] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500 font-semibold"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Title
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.title}
+              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+              className="w-full px-4 py-3 bg-[#111827] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 font-semibold"
+              placeholder="What did you work on?"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Description
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              className="w-full px-4 py-3 bg-[#111827] border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none h-28"
+              placeholder="Describe what you learned or accomplished..."
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Hours Spent
+              </label>
+              <input
+                type="number"
+                step="0.5"
+                min="0"
+                value={formData.hours_spent}
+                onChange={(e) => setFormData({ ...formData, hours_spent: parseFloat(e.target.value) || 0 })}
+                className="w-full px-4 py-3 bg-[#111827] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  required
-                  value={formData.date}
-                  onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="What did you work on?"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Description
-                </label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
-                  rows={3}
-                  placeholder="Describe what you learned or accomplished..."
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Hours Spent
-                  </label>
-                  <input
-                    type="number"
-                    step="0.5"
-                    min="0"
-                    value={formData.hours_spent}
-                    onChange={(e) => setFormData({ ...formData, hours_spent: parseFloat(e.target.value) || 0 })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Mood
-                  </label>
-                  <select
-                    value={formData.mood}
-                    onChange={(e) => setFormData({ ...formData, mood: e.target.value })}
-                    className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  >
-                    {moodOptions.map((option) => (
-                      <option key={option.value} value={option.value} className="bg-gray-900">
-                        {option.emoji} {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={handleCloseModal}
-                  className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-semibold hover:bg-white/10 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-semibold hover:shadow-lg transition-all flex items-center justify-center gap-2"
-                >
-                  <Save className="w-5 h-5" />
-                  Save
-                </button>
-              </div>
-            </form>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Mood
+              </label>
+              <select
+                value={formData.mood}
+                onChange={(e) => setFormData({ ...formData, mood: e.target.value })}
+                className="w-full px-4 py-3 bg-[#111827] border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
+              >
+                {moodOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.emoji} {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+
+          <div className="flex gap-3 pt-4">
+            <button
+              type="button"
+              onClick={handleCloseModal}
+              className="flex-1 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-lg font-bold hover:bg-white/10 transition-colors uppercase tracking-widest text-xs"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="flex-1 px-4 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg font-bold hover:shadow-lg transition-all flex items-center justify-center gap-2 uppercase tracking-widest text-xs shadow-xl shadow-primary-500/20"
+            >
+              <Save className="w-5 h-5" />
+              Save entry
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </SmoothLayout>
   )
 }

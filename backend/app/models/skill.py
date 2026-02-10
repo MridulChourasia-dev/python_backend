@@ -9,14 +9,6 @@ import enum
 from app.core.database import Base
 
 
-class SkillLevel(str, enum.Enum):
-    """Skill proficiency levels"""
-    BEGINNER = "beginner"
-    INTERMEDIATE = "intermediate"
-    ADVANCED = "advanced"
-    EXPERT = "expert"
-
-
 class Skill(Base):
     """Skill tracking model"""
     
@@ -26,8 +18,8 @@ class Skill(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     name = Column(String, nullable=False)  # e.g., "Python", "Machine Learning"
     category = Column(String, nullable=True)  # e.g., "Programming", "Data Science"
-    level = Column(Enum(SkillLevel), default=SkillLevel.BEGINNER)
-    target_level = Column(Enum(SkillLevel), nullable=True)
+    current_level = Column(Integer, default=0)
+    target_level = Column(Integer, nullable=True)
     description = Column(String, nullable=True)
     hours_invested = Column(Integer, default=0)
     
@@ -38,4 +30,4 @@ class Skill(Base):
     user = relationship("User", back_populates="skills")
     
     def __repr__(self):
-        return f"<Skill {self.name} - {self.level}>"
+        return f"<Skill {self.name} - {self.current_level}>"
