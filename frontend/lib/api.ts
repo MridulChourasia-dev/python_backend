@@ -12,6 +12,8 @@ if (API_URL && !API_URL.includes('.') && !API_URL.includes('localhost')) {
     API_URL = `${API_URL}.onrender.com`
 }
 
+console.log('🔌 SkillSphere API initialized at:', API_URL)
+
 // Create axios instance
 const api = axios.create({
     baseURL: API_URL,
