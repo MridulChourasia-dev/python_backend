@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+let API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
+
+// Ensure URL starts with protocol for Render/Production
+if (API_URL && !API_URL.startsWith('http')) {
+    API_URL = `https://${API_URL}`
+}
 
 // Create axios instance
 const api = axios.create({
