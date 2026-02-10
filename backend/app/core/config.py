@@ -13,6 +13,14 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "postgresql://skillsphere:skillsphere_dev_2026@localhost:5432/skillsphere_db"
     
+    @field_validator('DATABASE_URL', mode='before')
+    @classmethod
+    def fix_postgres_url(cls, v):
+        """Standardize postgres URL for SQLAlchemy"""
+        if isinstance(v, str) and v.startswith('postgres://'):
+            return v.replace('postgres://', 'postgresql://', 1)
+        return v
+    
     # Redis
     REDIS_URL: str = "redis://localhost:6379/0"
     
