@@ -22,8 +22,12 @@ async def lifespan(app: FastAPI):
     print(f"🔴 Redis: {settings.REDIS_URL}")
     
     # Create tables
-    base.Base.metadata.create_all(bind=engine)
-    print("✅ Database tables created (if not present)")
+    try:
+        base.Base.metadata.create_all(bind=engine)
+        print("✅ Database tables created successfully")
+    except Exception as e:
+        print(f"❌ Database error: {str(e)}")
+        print("💡 Hint: Check if DATABASE_URL is correct and the database is accessible.")
     
     yield
     
