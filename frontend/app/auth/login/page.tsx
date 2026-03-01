@@ -46,7 +46,7 @@ function LoginContent() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
-        {/* Success Message */}
+
         {showSuccess && (
           <div className="glass rounded-lg p-4 mb-6 border border-green-500/50 bg-green-500/10 animate-slide-up">
             <div className="flex items-center text-green-400">
@@ -56,7 +56,7 @@ function LoginContent() {
           </div>
         )}
 
-        {/* Card */}
+
         <div className="glass rounded-2xl p-8 shadow-2xl">
           <h2 className="text-3xl font-bold text-white mb-2 text-center">Welcome Back</h2>
           <p className="text-gray-400 text-center mb-8">Sign in to continue your journey</p>
@@ -68,7 +68,7 @@ function LoginContent() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
+
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Email
@@ -86,7 +86,7 @@ function LoginContent() {
               </div>
             </div>
 
-            {/* Password */}
+
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
                 Password
@@ -104,7 +104,7 @@ function LoginContent() {
               </div>
             </div>
 
-            {/* Submit Button */}
+
             <button
               type="submit"
               disabled={loading}
@@ -121,7 +121,7 @@ function LoginContent() {
             </button>
           </form>
 
-          {/* Sign Up Link */}
+
           <p className="text-center text-gray-400 mt-6">
             Don't have an account?{' '}
             <Link href="/auth/register" className="text-primary-400 hover:text-primary-300 font-semibold">
